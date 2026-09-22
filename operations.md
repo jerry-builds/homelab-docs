@@ -16,7 +16,7 @@ The point of writing it down was to make the gaps impossible to ignore. It worke
 
 The bulk pools have no parity. A drive failure loses that drive's files and nothing else, and the media on them is replaceable. The data that isn't replaceable (databases, vault, secrets, documents) lives on the guest NVMe and is backed up to the pool.
 
-This was tested involuntarily. In July 2026 an 8 TB drive dropped off the bus. SMART had passed on the last check. The pool kept serving from the remaining branches; the drive was commented out of fstab with a dated note, and the mountpoint names now lag the kernel device letters by one, which is why mounts are by UUID.
+This was tested involuntarily. In July 2026 an 8 TB drive dropped off the bus. SMART had passed on the last check. The pool kept serving from the remaining branches; the drive was commented out of fstab with a dated note, a replacement went in, and the pool was rebuilt with the new branch. The mountpoint names still lag the kernel device letters by one from the swap, which is why mounts are by UUID and not by device name.
 
 ## Monitoring
 
