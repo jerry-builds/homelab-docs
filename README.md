@@ -1,6 +1,6 @@
-# Homelab: two-node Proxmox environment
+# Homelab: multi-node Proxmox environment
 
-Documentation for the home lab I run in Oregon. Two Proxmox VE 9 hosts, 28 LXC containers, a virtualized OPNsense firewall, and the networking, DNS, remote access, identity and storage around them. Written from a live inspection of both hosts in September 2026, then trimmed for publication: addresses, hardware serials, credentials, and the internal domain are left out on purpose.
+Documentation for the home lab I run in Oregon. Multiple Proxmox VE 9 hosts (two at the time of writing), 28 LXC containers, a virtualized OPNsense firewall, and the networking, DNS, remote access, identity and storage around them. Written from a live inspection of both hosts in September 2026, then trimmed for publication: addresses, hardware serials, credentials, and the internal domain are left out on purpose.
 
 I keep this for the same reason I kept design docs at work. If I can't explain a design choice in writing, I don't understand it well enough to support it.
 
