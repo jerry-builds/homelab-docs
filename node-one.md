@@ -12,7 +12,7 @@
 | Boot | Samsung 960 EVO 250 GB NVMe |
 | Guest disks | Samsung 990 PRO 2 TB NVMe |
 | Bulk | Six SATA drives, 2 TB to 12 TB, HGST and Seagate |
-| UPS | CyberPower CP1500 AVR over USB |
+| UPS | CyberPower CP1500 AVR over USB, monitored by NUT |
 
 Proxmox VE 9.2 on Debian 13, single node, no cluster.
 

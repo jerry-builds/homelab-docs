@@ -11,7 +11,7 @@ Static addresses come from DHCP reservations on OPNsense, not from static config
 - WAN via DHCP with private and bogon networks blocked inbound.
 - Outbound NAT in hybrid mode.
 - Hardware offloads (checksum, TSO, LRO) disabled, as recommended for virtio NICs.
-- A WireGuard interface to a commercial VPN provider, configured with routes disabled so it's used only for policy routing. A small alias of devices is sent through that gateway by firewall rule, with a block rule beneath it as a kill switch. Getting the kill switch to actually hold required enabling "skip rules when gateway is down"; without it, OPNsense drops the gateway from the pass rule and the traffic leaks out the normal WAN. That one took a while to find.
+- A WireGuard interface to a commercial VPN provider, configured with routes disabled so it's used only for policy routing. A small alias of devices is sent through that gateway by firewall rule, with a block rule beneath it as a kill switch. Getting the kill switch to actually hold required enabling "skip rules when gateway is down"; without it, OPNsense drops the gateway from the pass rule and the traffic leaks out the normal WAN. That one took a while to find. Verified since by forcing the gateway down: the routed host loses internet, the LAN is unaffected ([hardening.md](hardening.md#4-opnsense-vpn-kill-switch)).
 - Inbound: a single port forward for a media server. Everything else reaches the LAN through the overlays in [remote-access.md](remote-access.md), so the firewall has no inbound rules for administration at all.
 
 ## DNS

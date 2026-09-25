@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-labelledby="t d" font-family="'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title id="t">Homelab architecture</title>
+  <desc id="d">Two Proxmox nodes on a 10 GbE LAN. Node two runs the OPNsense firewall, AdGuard Home DNS and a reverse proxy. Node one runs 28 containers including identity and secrets services, a Tailscale subnet router and exit node, a Twingate connector and a Cloudflare Tunnel connector. Remote access uses only outbound overlays; there are no inbound admin rules. Critical services are backed up daily, encrypted, to the data pool. Both nodes are on UPS with NUT.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#23272e"/></marker>
+    <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d9622b"/></marker>
+    <style>
+      .bg{fill:#f4f2ee}
+      .t{fill:#1f2328;font-size:15px;font-weight:600}
+      .s{fill:#5b616b;font-size:12.5px}
+      .m{font-family:'IBM Plex Mono',Menlo,Consolas,monospace;fill:#5b616b;font-size:11.5px;letter-spacing:.06em}
+      .h{fill:#1f2328;font-size:13px;font-weight:600}
+      .box{fill:#fff;stroke:#cfc9bf;stroke-width:1.2}
+      .node{fill:#fbfaf8;stroke:#23272e;stroke-width:1.6}
+      .ext{fill:#fff;stroke:#9aa0a8;stroke-width:1.2;stroke-dasharray:4 3}
+      .hot{fill:#fbe9df;stroke:#d9622b;stroke-width:1.4}
+      .ln{stroke:#23272e;stroke-width:1.8;fill:none}
+      .ov{stroke:#d9622b;stroke-width:1.8;fill:none;stroke-dasharray:7 5}
+      .gy{stroke:#8b9098;stroke-width:1.5;fill:none;stroke-dasharray:5 4}
+      .lab{fill:#d9622b;font-size:12px;font-weight:600}
+      .labg{fill:#5b616b;font-size:12px}
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="800" rx="10"/>
+
+  <text x="40" y="44" class="m">HOMELAB · ARCHITECTURE</text>
+  <text x="40" y="70" style="fill:#1f2328;font-size:22px;font-weight:700">Two Proxmox nodes, one flat LAN, no inbound admin ports</text>
+
+  <!-- External row -->
+  <rect class="ext" x="40" y="100" width="230" height="58" rx="8"/>
+  <text x="56" y="124" class="t">Commercial VPN</text>
+  <text x="56" y="143" class="s">WireGuard, policy-routed hosts only</text>
+
+  <rect class="ext" x="385" y="100" width="190" height="58" rx="8"/>
+  <text x="401" y="124" class="t">Internet</text>
+  <text x="401" y="143" class="s">ISP, DHCP on WAN</text>
+
+  <rect class="ext" x="915" y="100" width="245" height="58" rx="8"/>
+  <text x="931" y="124" class="t">Cloudflare edge</text>
+  <text x="931" y="143" class="s">TLS + DDoS for 2 public services</text>
+
+  <rect class="hot" x="643" y="100" width="245" height="58" rx="8"/>
+  <text x="659" y="124" class="t">My devices, anywhere</text>
+  <text x="659" y="143" class="s">phone on cellular, laptop away</text>
+
+  <!-- Node two -->
+  <rect class="node" x="40" y="205" width="535" height="215" rx="10"/>
+  <text x="58" y="230" class="m">NODE TWO · EDGE HOST</text>
+  <text x="400" y="230" class="m">UPS: APC ES 600M1 · NUT</text>
+
+  <rect class="box" x="58" y="244" width="250" height="160" rx="7"/>
+  <text x="72" y="266" class="h">OPNsense VM · firewall</text>
+  <text x="72" y="287" class="s">NAT, ~70 DHCP reservations</text>
+  <text x="72" y="306" class="s">Unbound: internal names, DoH out</text>
+  <text x="72" y="325" class="s">No inbound rules for admin</text>
+  <text x="72" y="344" class="s">WireGuard policy routing</text>
+  <rect class="hot" x="72" y="355" width="222" height="36" rx="5"/>
+  <text x="82" y="377" class="s" style="fill:#a2451b">Kill switch: verified</text>
+
+  <rect class="box" x="322" y="244" width="238" height="74" rx="7"/>
+  <text x="336" y="266" class="h">AdGuard Home</text>
+  <text x="336" y="286" class="s">LAN resolver + filtering</text>
+  <text x="336" y="304" class="s">forwards internal domain to Unbound</text>
+
+  <rect class="box" x="322" y="330" width="238" height="74" rx="7"/>
+  <text x="336" y="352" class="h">Nginx Proxy Manager</text>
+  <text x="336" y="372" class="s">reverse proxy, Let's Encrypt</text>
+  <text x="336" y="390" class="s">services by hostname</text>
+
+  <!-- LAN -->
+  <rect x="40" y="470" width="535" height="52" rx="8" fill="#23272e"/>
+  <text x="58" y="494" style="fill:#fff;font-size:15px;font-weight:600">LAN /24 · managed Layer 3 10 GbE switch</text>
+  <text x="58" y="512" style="fill:#c4c8cf;font-size:12.5px">node two: 4 x 10 GbE bridged · node one: 10 GbE SFP+</text>
+
+  <rect class="box" x="40" y="560" width="255" height="72" rx="8"/>
+  <text x="56" y="584" class="h">Wi-Fi 6E, three mesh nodes</text>
+  <text x="56" y="604" class="s">trusted devices, workstations</text>
+  <text x="56" y="622" class="s">addresses by DHCP reservation</text>
+
+  <rect class="box" x="320" y="560" width="255" height="72" rx="8"/>
+  <text x="336" y="584" class="h">IoT subnet (separate /24)</text>
+  <text x="336" y="604" class="s">hostapd AP on node one, NAT out</text>
+  <text x="336" y="622" class="s">no LAN access unless allowed</text>
+
+  <!-- Node one -->
+  <rect class="node" x="625" y="205" width="535" height="440" rx="10"/>
+  <text x="643" y="230" class="m">NODE ONE · MAIN HOST · 28 LXC</text>
+  <text x="962" y="230" class="m">UPS: CP1500 · NUT</text>
+
+  <rect class="hot" x="643" y="244" width="240" height="118" rx="7"/>
+  <text x="657" y="266" class="h">Remote-access connector</text>
+  <text x="657" y="286" class="s">Tailscale subnet router + exit node</text>
+  <text x="657" y="304" class="s">split DNS to AdGuard, MagicDNS</text>
+  <text x="657" y="322" class="s">ACL: LAN on 53/80/443/8006 only</text>
+  <text x="657" y="340" class="s">Twingate connector</text>
+
+  <rect class="box" x="897" y="244" width="245" height="54" rx="7"/>
+  <text x="911" y="266" class="h">cloudflared</text>
+  <text x="911" y="285" class="s">Cloudflare Tunnel, outbound-only</text>
+
+  <rect class="box" x="897" y="308" width="245" height="54" rx="7"/>
+  <text x="911" y="330" class="h">Identity and secrets</text>
+  <text x="911" y="349" class="s">Authentik SSO, Vaultwarden, Infisical</text>
+
+  <rect class="box" x="643" y="374" width="240" height="54" rx="7"/>
+  <text x="657" y="396" class="h">Databases</text>
+  <text x="657" y="415" class="s">PostgreSQL x2, Neo4j x2, Redis, Qdrant</text>
+
+  <rect class="box" x="897" y="374" width="245" height="54" rx="7"/>
+  <text x="911" y="396" class="h">AI, GPU passthrough</text>
+  <text x="911" y="415" class="s">Ollama, Open WebUI (RTX 2080)</text>
+
+  <rect class="box" x="643" y="440" width="240" height="54" rx="7"/>
+  <text x="657" y="462" class="h">Apps</text>
+  <text x="657" y="481" class="s">Mattermost, ntfy, SearXNG, Docker host</text>
+
+  <rect class="box" x="897" y="440" width="245" height="54" rx="7"/>
+  <text x="911" y="462" class="h">Media</text>
+  <text x="911" y="481" class="s">Plex, Jellyfin, libraries</text>
+
+  <rect x="643" y="512" width="499" height="115" rx="7" fill="#efece6" stroke="#cfc9bf"/>
+  <text x="657" y="534" class="h">Storage</text>
+  <text x="657" y="554" class="s">Guest NVMe: LVM-thin, every container's root disk</text>
+  <text x="657" y="573" class="s">Bulk: 6 HDD in 2 mergerfs pools (no parity, by design)</text>
+  <rect class="hot" x="657" y="584" width="471" height="32" rx="5"/>
+  <text x="669" y="604" class="s" style="fill:#a2451b">Daily encrypted backups (age) of identity + secrets, restore-tested</text>
+
+  <!-- Connectors -->
+  <path class="ln" d="M480,158 L480,190 L262,190 L262,244" marker-end="url(#a)"/>
+  <text x="360" y="184" class="labg">WAN</text>
+  <path class="gy" d="M58,300 L24,300 L24,129 L38,129" marker-end="url(#a)"/>
+  <text x="30" y="184" class="labg" transform="rotate(-90 30 184)" text-anchor="middle"></text>
+
+  <path class="ln" d="M183,404 L183,470"/>
+  <path class="ln" d="M441,404 L441,470"/>
+  <path class="ln" d="M575,496 L625,496"/>
+  <path class="ln" d="M167,522 L167,560"/>
+  <path class="ln" d="M575,596 L625,596"/>
+
+  <path class="gy" d="M940,244 L940,160" marker-end="url(#a)"/>
+  <text x="950" y="190" class="labg">tunnel dials out</text>
+
+  <path class="ov" d="M876,158 L876,242" marker-end="url(#ao)"/>
+  <text x="866" y="190" class="lab" text-anchor="end">tailnet: ACL, split DNS, exit node</text>
+
+  <!-- Legend -->
+  <line x1="40" y1="700" x2="80" y2="700" class="ln"/><text x="88" y="704" class="s">LAN / WAN path</text>
+  <line x1="220" y1="700" x2="260" y2="700" class="ov"/><text x="268" y="704" class="s">Tailscale overlay (outbound, no port forward)</text>
+  <line x1="590" y1="700" x2="630" y2="700" class="gy"/><text x="638" y="704" class="s">Other outbound connections</text>
+  <rect class="hot" x="840" y="691" width="24" height="16" rx="3"/><text x="872" y="704" class="s">Hardened and verified 2026-09-25</text>
+  <text x="40" y="748" class="m">ADDRESSES, SERIALS, CREDENTIALS AND THE INTERNAL DOMAIN ARE OMITTED ON PURPOSE</text>
+</svg>

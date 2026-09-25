@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homelab · Hardened and verified</title>
+<meta name="description" content="A two-node Proxmox home lab audited like production: seven security and reliability fixes, each tested from the outside, with architecture, runbooks and verified results.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Homelab: audited, hardened, and tested from the outside">
+<meta property="og:description" content="Two Proxmox nodes, 28 containers, zero inbound admin ports. Seven fixes, each with before, after and proof.">
+<meta property="og:url" content="https://jerry-builds.github.io/homelab-docs/">
+<meta property="og:image" content="https://jerry-builds.github.io/homelab-docs/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jerry-builds.github.io/homelab-docs/assets/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f2ee;--surface:#fff;--ink:#1f2328;--muted:#5b616b;--line:#d8d3ca;--accent:#d9622b;--accent-ink:#a2451b;--accent-soft:#fbe9df;--dark:#23272e;--ok:#2f7d4f;--ok-soft:#e3f1e8;--code:#efece6}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#15171a;--surface:#1d2024;--ink:#e8e6e1;--muted:#a3a8b0;--line:#33373d;--accent:#e8773f;--accent-ink:#f0a57c;--accent-soft:#3a261c;--dark:#0e1012;--ok:#5fbf85;--ok-soft:#1c2e23;--code:#262a2f}}
+:root[data-theme="dark"]{--bg:#15171a;--surface:#1d2024;--ink:#e8e6e1;--muted:#a3a8b0;--line:#33373d;--accent:#e8773f;--accent-ink:#f0a57c;--accent-soft:#3a261c;--dark:#0e1012;--ok:#5fbf85;--ok-soft:#1c2e23;--code:#262a2f}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+code{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:.88em;background:var(--code);padding:1px 5px;border-radius:4px}
+nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;justify-content:space-between;align-items:center;height:56px;gap:16px}
+nav .brand{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px;letter-spacing:.04em;text-decoration:none;white-space:nowrap}
+nav .brand span{color:var(--muted);font-weight:400}
+nav .links{display:flex;gap:20px;font-size:14px;overflow-x:auto}
+nav .links a{text-decoration:none;color:var(--muted);white-space:nowrap}
+nav .links a:hover{color:var(--ink)}
+header{padding:72px 0 40px}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:clamp(34px,5.4vw,56px);line-height:1.08;letter-spacing:-.015em;margin:14px 0 18px;max-width:900px}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{font-size:clamp(17px,2vw,20px);color:var(--muted);max-width:760px}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:6px;border:1px solid var(--ink);text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);background:var(--dark);border-radius:10px;color:#fff;margin:36px 0 0}
+.stat{padding:18px 18px 16px;border-right:1px solid #3a3f47}
+.stat:last-child{border-right:0}
+.stat b{display:block;font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:600}
+.stat span{font-size:13.5px;color:#c4c8cf;line-height:1.3;display:block;margin-top:2px}
+section{padding:64px 0 8px}
+h2{font-size:clamp(26px,3.4vw,34px);line-height:1.15;letter-spacing:-.01em;margin:10px 0 12px}
+.sub{color:var(--muted);max-width:760px;margin-bottom:26px}
+figure.diagram{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;overflow:hidden}
+figure.diagram img{display:block;width:100%;height:auto;border-radius:6px}
+figure.diagram figcaption{font-size:14px;color:var(--muted);padding:10px 8px 4px}
+.process{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:8px}
+.step{padding:0 10px 0 0;position:relative}
+.step .n{width:32px;height:32px;border-radius:50%;background:var(--dark);color:#fff;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;position:relative;z-index:2}
+.step::before{content:"";position:absolute;top:16px;left:40px;right:0;height:2px;background:var(--line)}
+.step:last-child::before{display:none}
+.step h3{font-size:17px;margin-top:12px}
+.step p{font-size:15px;color:var(--muted);margin-top:4px}
+.fixes{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.fix{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 20px 18px;display:flex;flex-direction:column}
+.fix .top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.fix .num{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--muted);letter-spacing:.08em}
+.fix .ok{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ok);background:var(--ok-soft);padding:2px 8px;border-radius:20px;white-space:nowrap}
+.fix h3{font-size:19px;margin:6px 0 12px}
+.row{display:grid;grid-template-columns:74px 1fr;gap:10px;font-size:15px;padding:7px 0;border-top:1px dashed var(--line)}
+.row .k{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.row.proof .v{color:var(--ink)}
+.row.proof .k{color:var(--accent-ink)}
+.fix.wide{grid-column:1/-1;border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.story{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;margin-top:6px}
+.story p{font-size:15.5px;color:var(--muted);margin-bottom:10px}
+.story p strong{color:var(--ink)}
+.timeline{list-style:none;border-left:2px solid var(--line);padding-left:16px}
+.timeline li{position:relative;font-size:14.5px;padding:0 0 12px}
+.timeline li::before{content:"";position:absolute;left:-22px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--line)}
+.timeline li.bad::before{background:var(--accent)}
+.timeline li.good::before{background:var(--ok)}
+.more{margin-top:14px;font-size:14.5px}
+.more a{color:var(--accent-ink)}
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:15px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--code)}
+tr:last-child td{border-bottom:0}
+td b{font-weight:600}
+.runbooks{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.rb{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;text-decoration:none;display:block}
+.rb:hover{border-color:var(--ink)}
+.rb .k{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.rb h3{font-size:17px;margin:6px 0}
+.rb p{font-size:14.5px;color:var(--muted)}
+footer{margin-top:72px;border-top:1px solid var(--line);padding:28px 0 48px;font-size:14.5px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer a{color:var(--ink)}
+@media (max-width:860px){
+ .stats{grid-template-columns:repeat(3,1fr)}
+ .stat:nth-child(3){border-right:0}
+ .stat:nth-child(-n+3){border-bottom:1px solid #3a3f47}
+ .process{grid-template-columns:1fr;gap:16px}
+ .step::before{display:none}
+ .fixes,.story,.runbooks{grid-template-columns:1fr}
+ nav .links{display:none}
+ th:nth-child(3),td:nth-child(3){display:none}
+}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+ <a class="brand" href="#top">HOMELAB <span>/ case study</span></a>
+ <div class="links"><a href="#architecture">Architecture</a><a href="#method">Method</a><a href="#fixes">Fixes</a><a href="#access">Remote access</a><a href="#runbooks">Runbooks</a></div>
+</div></nav>
+
+<header id="top"><div class="wrap">
+ <div class="eyebrow">Case study · Infrastructure and support</div>
+ <h1>A home lab run like production: audited, hardened, and <em>tested from the outside</em>.</h1>
+ <p class="lede">Two Proxmox nodes, 28 containers, a virtualized firewall, and no inbound ports for administration. In September 2026 I audited it as if it were someone else's environment, fixed what I found, and proved each fix from the side a failure or an attacker would come from.</p>
+ <div class="ctas">
+  <a class="btn primary" href="#fixes">See the seven fixes ↓</a>
+  <a class="btn" href="https://github.com/jerry-builds/homelab-docs">Read the docs on GitHub ↗</a>
+ </div>
+ <div class="stats">
+  <div class="stat"><b>2</b><span>Proxmox VE 9 nodes</span></div>
+  <div class="stat"><b>28</b><span>LXC containers</span></div>
+  <div class="stat"><b>0</b><span>inbound admin ports</span></div>
+  <div class="stat"><b>7</b><span>fixes, each verified</span></div>
+  <div class="stat"><b>1</b><span>full restore test passed</span></div>
+  <div class="stat"><b>10G</b><span>switched LAN</span></div>
+ </div>
+</div></header>
+
+<section id="architecture"><div class="wrap">
+ <div class="eyebrow">Architecture</div>
+ <h2>Two nodes, one flat LAN, three outbound overlays</h2>
+ <p class="sub">The edge host runs the firewall and DNS, so the network stays up while the main host is down for maintenance. Everything I reach remotely comes in through connections that dial <em>out</em>, so the firewall has no inbound rules for administration at all.</p>
+ <figure class="diagram">
+  <img src="assets/architecture.svg" alt="Architecture diagram: node two runs OPNsense, AdGuard Home and Nginx Proxy Manager; node one runs 28 containers including the Tailscale and Twingate connector, cloudflared, identity and secrets, databases, AI with GPU passthrough, apps and media; both on a 10 GbE LAN; remote devices reach the LAN through the Tailscale overlay; critical services are backed up encrypted to the data pool.">
+  <figcaption>Addresses, serials, credentials and the internal domain are left out on purpose. <a href="assets/architecture.svg">Open full size ↗</a></figcaption>
+ </figure>
+</div></section>
+
+<section id="method"><div class="wrap">
+ <div class="eyebrow">Method</div>
+ <h2>The same loop I'd run on a customer's problem</h2>
+ <p class="sub">Support work and infrastructure work share one habit: don't trust that something is fixed until you've watched it fail safely.</p>
+ <div class="process">
+  <div class="step"><div class="n">1</div><h3>Inspect</h3><p>Read the live systems: every guest config, every listening port, the firewall export.</p></div>
+  <div class="step"><div class="n">2</div><h3>Audit</h3><p>Read it back as a stranger and rank what I found by risk.</p></div>
+  <div class="step"><div class="n">3</div><h3>Check first</h3><p>Prove nothing depends on a thing before I remove it.</p></div>
+  <div class="step"><div class="n">4</div><h3>Fix, then prove</h3><p>Test from outside: another host, a phone on cellular, a forced failure.</p></div>
+  <div class="step"><div class="n">5</div><h3>Write it down</h3><p>Document the result and add a runbook so it can be repeated.</p></div>
+ </div>
+</div></section>
+
+<section id="fixes"><div class="wrap">
+ <div class="eyebrow">Hardening log · completed 2026-09-25</div>
+ <h2>Seven fixes, each with before, after and proof</h2>
+ <p class="sub">The full write-up, with the reasoning behind each change, is in <a href="https://github.com/jerry-builds/homelab-docs/blob/main/hardening.md">hardening.md</a>.</p>
+
+ <div class="fixes">
+  <div class="fix wide">
+   <div class="top"><span class="num">04 · OPNSENSE</span><span class="ok">✓ verified</span></div>
+   <h3>The VPN kill switch that wasn't</h3>
+   <div class="story">
+    <div>
+     <p>A few hosts are policy-routed through a WireGuard tunnel to a VPN provider, with a block rule underneath as a kill switch. On paper, if the tunnel drops, their traffic stops.</p>
+     <p><strong>It didn't.</strong> With the gateway down, the policy rule still matched and sent the traffic out the regular WAN. The block rule never got a chance to act. The fix is one setting, "Skip rules when gateway is down". Finding the cause took longer than fixing it.</p>
+    </div>
+    <ul class="timeline">
+     <li class="bad">Tunnel down: routed host still reaches the internet through the ISP. Leak.</li>
+     <li>Config backed up; "Skip rules when gateway is down" enabled (OPNsense 25.7).</li>
+     <li class="good">Gateway forced down: <code>curl</code> to two IP-echo services times out, ICMP 100% loss.</li>
+     <li class="good">LAN access and non-VPN hosts unaffected.</li>
+     <li class="good">Gateway restored: host exits through the VPN provider again.</li>
+    </ul>
+   </div>
+  </div>
+
+  <div class="fix">
+   <div class="top"><span class="num">01 · BACKUPS</span><span class="ok">✓ restore-tested</span></div>
+   <h3>Encrypted backups of what can't be replaced</h3>
+   <div class="row"><span class="k">Before</span><span class="v">No scheduled backups of Vaultwarden, Authentik, Infisical or cloudflared.</span></div>
+   <div class="row"><span class="k">After</span><span class="v">Daily application-level dumps and snapshots, checked, then age-encrypted to a key kept off the host. 7 daily and 4 weekly runs kept.</span></div>
+   <div class="row proof"><span class="k">Proof</span><span class="v">Restored on a separate machine: every file decrypted, every SHA-256 matched.</span></div>
+  </div>
+
+  <div class="fix">
+   <div class="top"><span class="num">02 · DOCKER</span><span class="ok">✓ verified</span></div>
+   <h3>An open Docker API, closed</h3>
+   <div class="row"><span class="k">Before</span><span class="v">Engine API on tcp/2375, no authentication, on two containers: a host takeover from anywhere on the LAN.</span></div>
+   <div class="row"><span class="k">After</span><span class="v">After a config search on both nodes and a ten-minute live connection watch found no consumers, the TCP listener was removed.</span></div>
+   <div class="row proof"><span class="k">Proof</span><span class="v">From another host: <code>nc</code> refused, <code>nmap</code> closed. Local socket fine; Authentik healthy in ~25 s.</span></div>
+  </div>
+
+  <div class="fix">
+   <div class="top"><span class="num">03 · POWER</span><span class="ok">✓ dry-run tested</span></div>
+   <h3>UPS that actually shuts things down</h3>
+   <div class="row"><span class="k">Before</span><span class="v">UPS units on USB with nothing watching them.</span></div>
+   <div class="row"><span class="k">After</span><span class="v">NUT on both nodes: stop every guest cleanly, then halt. The smaller UPS triggers early (180 s or 50%) to leave headroom.</span></div>
+   <div class="row proof"><span class="k">Proof</span><span class="v"><code>upsc</code> reporting on both, <code>upsdrvctl -t shutdown</code>, hook dry run. The real forced shutdown was deliberately not fired.</span></div>
+  </div>
+
+  <div class="fix">
+   <div class="top"><span class="num">05 · TAILSCALE</span><span class="ok">✓ verified</span></div>
+   <h3>Subnet router with split DNS</h3>
+   <div class="row"><span class="k">After</span><span class="v">Persistent forwarding, LAN route approved, internal domain resolved by AdGuard Home over the tailnet.</span></div>
+   <div class="row"><span class="k">Snag</span><span class="v">A laptop on the LAN began sending its local traffic through the tailnet. Fixed with a NetworkManager routing rule on the home Wi-Fi only.</span></div>
+   <div class="row proof"><span class="k">Proof</span><span class="v">From an iPhone on cellular, a LAN-only service loaded by internal hostname.</span></div>
+  </div>
+
+  <div class="fix">
+   <div class="top"><span class="num">06 · TAILSCALE</span><span class="ok">✓ tests pass</span></div>
+   <h3>An ACL that tests itself</h3>
+   <div class="row"><span class="k">Before</span><span class="v">Default allow-all.</span></div>
+   <div class="row"><span class="k">After</span><span class="v"><code>tag:router</code>; LAN reachable only on 53, 80, 443, 8006; <code>autoApprovers</code> for route and exit node. Built-in tests allow DNS, web and the Proxmox UI, and deny SSH, the Authentik admin port and the Docker API.</span></div>
+   <div class="row proof"><span class="k">Proof</span><span class="v">From cellular, SSH to a LAN host times out, and the same port answers from inside the LAN.</span></div>
+  </div>
+
+  <div class="fix">
+   <div class="top"><span class="num">07 · TAILSCALE</span><span class="ok">✓ verified</span></div>
+   <h3>Exit node, no IPv6 leak</h3>
+   <div class="row"><span class="k">After</span><span class="v">Router advertises an exit node, approved automatically by policy.</span></div>
+   <div class="row proof"><span class="k">Proof</span><span class="v">IP-echo shows the home WAN with it on and the carrier with it off. No IPv6 default route on the router, so no leak over the carrier's IPv6.</span></div>
+  </div>
+ </div>
+</div></section>
+
+<section id="access"><div class="wrap">
+ <div class="eyebrow">Remote access</div>
+ <h2>Three overlays, one job each</h2>
+ <p class="sub">Running all three side by side is deliberate: each solves a different problem, and comparing them is the fastest way to understand what each one is really doing.</p>
+ <table>
+  <thead><tr><th>Tool</th><th>Used for</th><th>Why this one</th></tr></thead>
+  <tbody>
+   <tr><td><b>Tailscale</b></td><td>Reaching the LAN from my own devices, anywhere</td><td>Device-to-device with NAT traversal; one subnet router instead of a client in every container</td></tr>
+   <tr><td><b>Twingate</b></td><td>Access to specific services for specific identities</td><td>Resource-level policy without exposing a subnet; a useful contrast with Tailscale ACLs</td></tr>
+   <tr><td><b>Cloudflare Tunnel</b></td><td>Public web ingress for two services</td><td>Outbound-only connector, TLS and DDoS handled upstream, no port forward</td></tr>
+  </tbody>
+ </table>
+ <p class="more">Known limitation, written down rather than hidden: the LAN uses the most common home /24, so it can collide with a remote network's range. The options are renumbering the LAN or using 4via6. <a href="https://github.com/jerry-builds/homelab-docs/blob/main/remote-access.md">remote-access.md ↗</a></p>
+</div></section>
+
+<section id="runbooks"><div class="wrap">
+ <div class="eyebrow">Runbooks</div>
+ <h2>Written so it can be run at 2 a.m.</h2>
+ <p class="sub">Each runbook has checks before and after. A step without a way to confirm it worked isn't finished.</p>
+ <div class="runbooks">
+  <a class="rb" href="https://github.com/jerry-builds/homelab-docs/blob/main/runbooks/restore-from-backup.md"><div class="k">Recovery</div><h3>Restore from backup ↗</h3><p>Pick the right run, decrypt, verify checksums, restore per service, and prove it with a login.</p></a>
+  <a class="rb" href="https://github.com/jerry-builds/homelab-docs/blob/main/runbooks/ups-power-loss.md"><div class="k">Power</div><h3>Power loss and UPS ↗</h3><p>What happens on battery, the safe tests, the one command not to run, and the recovery order.</p></a>
+  <a class="rb" href="https://github.com/jerry-builds/homelab-docs/blob/main/runbooks/tailscale-new-device.md"><div class="k">Access</div><h3>Add a device to the tailnet ↗</h3><p>Enroll, then prove access matches the ACL: hostname loads, SSH blocked, exit node switches.</p></a>
+ </div>
+</div></section>
+
+<footer><div class="wrap">
+ <span>Built and documented by me. Also see <a href="https://jerry-builds.github.io/project-workbench-case-study/">PROJECT_WORKBENCH</a>, an AI spec pipeline case study.</span>
+ <span><a href="https://www.linkedin.com/in/jerry-rivas">LinkedIn</a> · <a href="https://github.com/jerry-builds">GitHub</a></span>
+</div></footer>
+</body>
+</html>

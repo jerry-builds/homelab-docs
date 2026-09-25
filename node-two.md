@@ -11,7 +11,7 @@ An older machine that exists to keep the network up when the main host is down f
 | Memory | 32 GB DDR3 (the board's maximum) |
 | NICs | Two dual-port Intel X540 10 GbE cards, one quad-port Realtek 2.5 GbE card, onboard 1 GbE |
 | Storage | 256 GB NVMe boot, two small SATA drives for guest disks |
-| UPS | APC over USB |
+| UPS | APC Back-UPS ES 600M1 over USB, monitored by NUT |
 
 Proxmox VE 9.1 on Debian 13. Mounts the main host's data pool over SMB 3 via systemd automount with `nofail`, so it boots cleanly if node one is off.
 
